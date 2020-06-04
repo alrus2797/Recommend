@@ -1,0 +1,15 @@
+[package]
+name = "movielens_connection"
+version = "0.1.0"
+authors = ["alrus2797 <alrus2797@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+diesel = { version = "1.0.0", features = ["postgres"] }
+connection_manager = {version = "*", path = "../../connection_manager"}
+dotenv = "0.15.0"
+csv = "1.1"
+indicatif = "0.14.0"
+common_macros = "0.1.1"

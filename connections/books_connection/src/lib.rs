@@ -120,23 +120,30 @@ impl ConnectionManager<BookUser, Book> for BookConnection{
         BookConnection { connection } 
     }
 
-    fn get_user_by_id(&self, id: i32) -> BookUser {
+    fn get_user_by_id(&self, id: i32) -> Option<BookUser> {
         let user_result = users::table
             .find(id)
             .first::<User>(&self.connection)
-            .expect("Error when reading user");
-
-        let ratings = Rating::belonging_to(&user_result)
-            .load::<Rating>(&self.connection)
-            .expect("Error when reading ratings belonging user");
-
-        let mut ratings_hm = HashMap::new();
-
-        for rating in ratings{
-            ratings_hm.insert(rating.book_id, rating.score);
-        }
+            .optional()
+            .unwrap();
         
-        BookUser::create_from_model(&user_result, ratings_hm)
+        if let Some(res) = user_result{
+            let ratings = Rating::belonging_to(&res)
+                .load::<Rating>(&self.connection)
+                .expect("Error when reading ratings belonging user");
+    
+            let mut ratings_hm = HashMap::new();
+    
+            for rating in ratings{
+                ratings_hm.insert(rating.book_id, rating.score);
+            }
+            
+            Some(BookUser::create_from_model(&res, ratings_hm))
+        }
+        else{
+            None
+        }
+
     }
 
     fn get_user_by_name(&self, address: String) -> Vec<BookUser> {
@@ -164,11 +171,18 @@ impl ConnectionManager<BookUser, Book> for BookConnection{
 
     }
 
-    fn get_item_by_id(&self, id: i32) -> Book {
-        books::table
-        .find(id)
-        .first::<Book>(&self.connection)
-        .expect("Error when reading books")
+    fn get_item_by_id(&self, id: i32) -> Option<Book> {
+        let books = books::table
+            .find(id)
+            .first::<Book>(&self.connection)
+            .optional()
+            .unwrap();
+        if let Some(res) = books{
+            Some(res)
+        }
+        else{
+            None
+        }
     }
 
     fn get_item_by_name (&self, title: String) -> Vec<Book> {
@@ -177,6 +191,26 @@ impl ConnectionManager<BookUser, Book> for BookConnection{
         .load::<Book>(&self.connection)
         .expect("Error when reading movies")
     }
+
+    // fn get_all_users(&self) -> HashMap<i32, HashMap<i32, f64>>{
+    //     let user_result = users::table.load::<User>(&self.connection).unwrap();
+        
+    //     let ratings = Rating::belonging_to(&user_result)
+    //         .load::<Rating>(&self.connection)
+    //         .expect("Error when reading ratings")
+    //         .grouped_by(&user_result);
+
+
+    //     let vec_users = HashMap::new();
+    //     for (idx, user) in user_result.iter().enumerate(){
+    //         let mut ratings_hm = HashMap::new();
+    //         for rating in &ratings[idx]{
+    //             ratings_hm.insert(rating.book_id, rating.score);
+    //         }
+    //         vec_users.push(BookUser::create_from_model(user, ratings_hm));
+    //     }
+
+    // }
 
     
 }

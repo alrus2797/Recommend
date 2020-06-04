@@ -16,7 +16,7 @@ use self::models::*;
 pub struct MovieUser {
     id: i32,
     name: String,
-    ratings: HashMap<i32, f64>
+    pub ratings: HashMap<i32, f64>
 }
 
 impl UserTrait for MovieUser{
@@ -94,23 +94,31 @@ impl ConnectionManager<MovieUser, Movie> for MovieConnection{
         MovieConnection { connection } 
     }
 
-    fn get_user_by_id(&self, id: i32) -> MovieUser {
+    fn get_user_by_id(&self, id: i32) -> Option<MovieUser> {
         let user_result = users::table
             .find(id)
             .first::<User>(&self.connection)
-            .expect("Error when reading user");
-
-        let ratings = Rating::belonging_to(&user_result)
+            .optional()
+            .unwrap();
+        
+        if let Some(res) = user_result{
+            let ratings = Rating::belonging_to(&res)
             .load::<Rating>(&self.connection)
             .expect("Error when reading ratings belonging user");
 
-        let mut ratings_hm = HashMap::new();
+            let mut ratings_hm = HashMap::new();
 
-        for rating in ratings{
-            ratings_hm.insert(rating.movie_id, rating.score);
+            for rating in ratings{
+                ratings_hm.insert(rating.movie_id, rating.score);
+            }
+            
+            Some(MovieUser::create_from_model(&res, ratings_hm))
         }
-        
-        MovieUser::create_from_model(&user_result, ratings_hm)
+        else{
+            None
+        }
+
+
     }
 
     fn get_user_by_name(&self, name: String) -> Vec<MovieUser> {
@@ -139,11 +147,20 @@ impl ConnectionManager<MovieUser, Movie> for MovieConnection{
 
     }
 
-    fn get_item_by_id(&self, id: i32) -> Movie {
-        movies::table
+    fn get_item_by_id(&self, id: i32) -> Option<Movie> {
+        let movie = movies::table
         .find(id)
         .first::<Movie>(&self.connection)
-        .expect("Error when reading movies")
+        .optional()
+        .unwrap();
+
+        if let Some(res) = movie{
+            Some(res)
+        }
+        else{
+            None
+        }
+
     }
 
     fn get_item_by_name (&self, name: String) -> Vec<Movie> {

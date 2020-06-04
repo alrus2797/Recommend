@@ -17,7 +17,15 @@ fn main() {
 
     let user = controller.get_user_by_id(276725);
     let item = controller.get_item_by_id(1);
-    println!("{:#?}", item.title);
-    println!("{:#?}", user.ratings);
+    
+    match user {
+        Some(u) => println!("User {:#?}", u.ratings),
+        None => {}
+    }
+
+    match item{
+        Some(i) => println!("Ratings {:#?}", i.title),
+        None => {}
+    }
     
 }
