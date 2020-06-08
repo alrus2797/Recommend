@@ -37,5 +37,11 @@ fn main() {
         Some(i) => println!("Ratings {:#?}", i.title),
         None => {}
     }
+
+    let items = controller.get_all_ratings();
+    let items_average = controller.get_average_by_user();
+
+    println!("{:#?}", items);
+    println!("{:#?}", items_average);
     
 }

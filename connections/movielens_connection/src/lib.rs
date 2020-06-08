@@ -144,5 +144,12 @@ impl ConnectionManager<MovieLenUser, Movie> for MovieLensConnection{
         Vec::<Movie>::new()
     }
 
-    
+
+    fn get_all_ratings(&self) -> HashMap<i32, HashMap<i32, f64>> {
+        todo!();
+    }
+
+    fn get_average_by_user(&self) -> HashMap<i32, f64> {
+        todo!();
+    }
 }

@@ -112,3 +112,22 @@ pub fn jaccard_distance(first: &HashMap<i32, f64>, second: &HashMap<i32, f64>) -
         return 1. - jacc_index;
     }
 }
+
+pub fn adjusted_cosine_simmilarity(first: &HashMap<i32, f64>, second: &HashMap<i32, f64>, averages:  &HashMap<i32, f64>) -> f64{
+    let mut numerator   = 0.0;
+    let mut first_factor    = 0.0;
+    let mut second_factor   = 0.0;
+    print!("Numerador: ");
+    for (key, val1) in first{
+        if let Some(val2) = second.get(key){
+            numerator   += (val1 - averages[key]) * (val2 - averages[key]);
+            print!("({:.4} - {:.4}) * ({:.4} - {:.4}) + ", val1, averages[key], val2, averages[key]);
+            first_factor += (val1 - averages[key]).powi(2);
+            second_factor+= (val2 - averages[key]).powi(2);
+        }
+    }
+    println!("\n");
+    first_factor    = first_factor.sqrt();
+    second_factor   = second_factor.sqrt();
+    return numerator/(first_factor * second_factor)
+}

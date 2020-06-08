@@ -192,6 +192,7 @@ impl ConnectionManager<BookUser, Book> for BookConnection{
         .expect("Error when reading movies")
     }
 
+
     // fn get_all_users(&self) -> HashMap<i32, HashMap<i32, f64>>{
     //     let user_result = users::table.load::<User>(&self.connection).unwrap();
         
@@ -212,5 +213,12 @@ impl ConnectionManager<BookUser, Book> for BookConnection{
 
     // }
 
+    fn get_all_ratings(&self) -> HashMap<i32, HashMap<i32, f64>> {
+        todo!();
+    }
+
+    fn get_average_by_user(&self) -> HashMap<i32, f64> {
+        todo!();
+    }
     
 }

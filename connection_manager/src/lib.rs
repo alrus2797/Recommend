@@ -12,6 +12,8 @@ pub trait ConnectionManager<User, Item>
     fn get_item_by_name(&self, name: String) -> Vec<Item>;
 
     // fn get_all_users(&self) -> Vec<User>;
+    fn get_all_ratings(&self) -> HashMap<i32, HashMap<i32, f64>>;
+    fn get_average_by_user(&self) -> HashMap<i32, f64>;
 }
 
 pub trait UserTrait

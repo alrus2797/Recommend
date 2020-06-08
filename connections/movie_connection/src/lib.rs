@@ -170,5 +170,41 @@ impl ConnectionManager<MovieUser, Movie> for MovieConnection{
         .expect("Error when reading movies")
     }
 
-    
+    fn get_all_ratings(&self) -> HashMap<i32, HashMap<i32, f64>> {
+        let items = movies::table.load::<Movie>(&self.connection).unwrap();
+        let ratings = ratings::table.load::<Rating>(&self.connection).unwrap().grouped_by(&items);
+        let mut hash = HashMap::new();
+        let mut avg_hash : HashMap <i32, f64> = HashMap::new();
+        let mut cont_hash : HashMap<i32, i32> = HashMap::new();
+
+        for item in items{
+            let mut rating_hash = HashMap::new();
+            for rating in &ratings[(item.id - 1) as usize]{
+                rating_hash.insert(rating.user_id, rating.score);
+                if ! avg_hash.contains_key(&rating.id){
+                    avg_hash.insert(rating.id, 0.0);
+                }
+            }
+            hash.insert(item.id, rating_hash);
+        }
+
+        return hash;
+    }
+
+    fn get_average_by_user(&self) -> HashMap<i32, f64> {
+        let users = users::table.load::<User>(&self.connection).unwrap();
+        let ratings = ratings::table.load::<Rating>(&self.connection).unwrap().grouped_by(&users);
+        let mut hash = HashMap::new();
+        for user in users {
+            if !hash.contains_key(&user.id){
+                hash.insert(user.id, 0.0);
+            }
+            for rating in &ratings[(user.id - 1) as usize]{
+                *hash.get_mut(&rating.user_id).unwrap() += rating.score;
+            }
+            *hash.get_mut(&user.id).unwrap() /= (ratings[(user.id - 1) as usize].len() as f64);
+        }
+        return hash;
+    }
 }
+
