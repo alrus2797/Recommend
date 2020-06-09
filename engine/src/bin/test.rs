@@ -43,17 +43,17 @@ fn main() -> std::io::Result<()>{
     
     let mut temp_matrix: Vec<f64> = Vec::new();
     let mut distance : f64;
-    // for (_, item1) in &items{
-    //     for (_, item2) in &items{
-    //         distance = engine::adjusted_cosine_simmilarity(&item1, &item2, &items_average);
-    //         temp_matrix.push(distance);
-    //         file.write(distance.to_string().as_bytes());
-    //         file.write(b", ");
-    //     }
-    //     file.write(b"\n");
-    //     matrix.push(temp_matrix.clone());
-    //     temp_matrix.clear();
-    // }
+    for (_, item1) in &items{
+        for (_, item2) in &items{
+            distance = engine::adjusted_cosine_simmilarity(&item1, &item2, &items_average);
+            temp_matrix.push(distance);
+            file.write(distance.to_string().as_bytes());
+            file.write(b", ");
+        }
+        file.write(b"\n");
+        matrix.push(temp_matrix.clone());
+        temp_matrix.clear();
+    }
     let res = engine::adjusted_cosine_simmilarity(&items[&2], &items[&1], &items_average);
     println!("Distance: {}", res);
 
